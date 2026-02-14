@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Master stack - deploys all infrastructure via nested stacks"
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+  # Optional: put shared CIDRs here to keep one place of truth
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+
+  ArtifactBucket:
+    Type: String
+    Description: "S3 bucket where packaged nested templates are uploaded (cloudformation package)"
+
+Resources:
+  Network:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/network.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcCidr: !Ref VpcCidr
+
+  Security:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Network
+    Properties:
+      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/security.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcId: !GetAtt Network.Outputs.VpcId
+
+  Rds:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Security
+    Properties:
+      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/rds.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcId: !GetAtt Network.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt Network.Outputs.PrivateSubnetIds
+        DbSecurityGroupId: !GetAtt Security.Outputs.RdsSecurityGroupId
+
+  Ecs:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Rds
+    Properties:
+      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/ecs.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcId: !GetAtt Network.Outputs.VpcId
+        PublicSubnetIds: !GetAtt Network.Outputs.PublicSubnetIds
+        PrivateSubnetIds: !GetAtt Network.Outputs.PrivateSubnetIds
+        AlbSecurityGroupId: !GetAtt Security.Outputs.AlbSecurityGroupId
+        EcsSecurityGroupId: !GetAtt Security.Outputs.EcsSecurityGroupId
+        DbEndpoint: !GetAtt Rds.Outputs.DbEndpoint
+        DbSecretArn: !GetAtt Rds.Outputs.DbSecretArn
+
+  Frontend:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Network
+    Properties:
+      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/frontend-s3.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+
+Outputs:
+  VpcId:
+    Value: !GetAtt Network.Outputs.VpcId
+  AlbDnsName:
+    Value: !GetAtt Ecs.Outputs.AlbDnsName
+  FrontendBucket:
+    Value: !GetAtt Frontend.Outputs.FrontendBucketName
