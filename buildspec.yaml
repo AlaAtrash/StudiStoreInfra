@@ -9,9 +9,4 @@ phases:
   build:
     commands:
       - aws --version
-      - aws cloudformation deploy \
-          --region "$AWS_REGION" \
-          --stack-name "${ENV_NAME}-network" \
-          --template-file network.yaml \
-          --capabilities CAPABILITY_NAMED_IAM \
-          --parameter-overrides EnvironmentName="$ENV_NAME"
+      - aws cloudformation deploy --region "$AWS_REGION" --stack-name "${ENV_NAME}-network" --template-file network.yaml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides EnvironmentName="$ENV_NAME"
