@@ -11,7 +11,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: "network.yaml"
-      RoleARN: arn:aws:iam::142706263687:role/cfn-studistoreinfra-exec-role
+      
       
       
   #Security:
