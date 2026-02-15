@@ -59,7 +59,3 @@ Resources:
 Outputs:
   VpcId:
     Value: !GetAtt Network.Outputs.VpcId
-  AlbDnsName:
-    Value: !GetAtt Ecs.Outputs.AlbDnsName
-  FrontendBucket:
-    Value: !GetAtt Frontend.Outputs.FrontendBucketName
