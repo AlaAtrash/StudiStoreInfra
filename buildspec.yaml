@@ -27,7 +27,6 @@ phases:
         --template-file master.packaged.yaml 
         --capabilities CAPABILITY_NAMED_IAM 
         --parameter-overrides EnvironmentName="$ENV_NAME" 
-        --role-arn arn:aws:iam::142706263687:role/cfn-studistoreinfra-exec-role 
         --parameter-overrides EnvironmentName="$ENV_NAME"
 
 artifacts:
