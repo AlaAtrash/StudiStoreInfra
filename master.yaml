@@ -6,10 +6,6 @@ Parameters:
     Type: String
     Default: dev
 
-  ArtifactBucket:
-    Type: String
-    Description: "S3 bucket where packaged nested templates are uploaded (cloudformation package)"
-
 Resources:
   Network:
     Type: AWS::CloudFormation::Stack
