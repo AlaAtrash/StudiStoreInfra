@@ -17,6 +17,7 @@ phases:
       - echo "Using env file $ENV_FILE"
   build:
     commands:
+      - set -euo pipefail
       - set -a; . "./$ENV_FILE"; set +a
       - |
         aws cloudformation package \
@@ -26,11 +27,16 @@ phases:
           --s3-prefix "cfn/$ENV_NAME" \
           --output-template-file master.packaged.yaml
       - |
+        aws cloudformation validate-template \
+          --region "$AWS_REGION" \
+          --template-body file://master.packaged.yaml
+      - |
         aws cloudformation deploy \
           --region "$AWS_REGION" \
           --stack-name "${ENV_NAME}-master" \
           --template-file master.packaged.yaml \
           --capabilities CAPABILITY_NAMED_IAM \
+          --no-fail-on-empty-changeset \
           --role-arn "$CFN_EXEC_ROLE_ARN" \
           --parameter-overrides \
             ArtifactBucket="$ARTIFACT_BUCKET" \
