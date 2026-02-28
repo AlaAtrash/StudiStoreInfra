@@ -19,25 +19,25 @@ phases:
     commands:
       - set -a; . "./$ENV_FILE"; set +a
       - |
-        aws cloudformation package 
-          --region "$AWS_REGION" 
-          --template-file master.yaml 
-          --s3-bucket "$ARTIFACT_BUCKET" 
-          --s3-prefix "cfn/$ENV_NAME" 
+        aws cloudformation package \
+          --region "$AWS_REGION" \
+          --template-file master.yaml \
+          --s3-bucket "$ARTIFACT_BUCKET" \
+          --s3-prefix "cfn/$ENV_NAME" \
           --output-template-file master.packaged.yaml
       - |
-        aws cloudformation deploy
-          --region "$AWS_REGION" 
-          --stack-name "${ENV_NAME}-master" 
-          --template-file master.packaged.yaml 
-          --capabilities CAPABILITY_NAMED_IAM 
-          --role-arn "$CFN_EXEC_ROLE_ARN" 
-          --parameter-overrides 
-            EnvironmentName="$ENV_NAME" 
-            VpcCidr="$VPC_CIDR" 
-            PublicSubnetACidr="$PUBLIC_SUBNET_A_CIDR" 
-            PublicSubnetBCidr="$PUBLIC_SUBNET_B_CIDR" 
-            PrivateSubnetACidr="$PRIVATE_SUBNET_A_CIDR" 
+        aws cloudformation deploy \
+          --region "$AWS_REGION" \
+          --stack-name "${ENV_NAME}-master" \
+          --template-file master.packaged.yaml \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --role-arn "$CFN_EXEC_ROLE_ARN" \
+          --parameter-overrides \
+            EnvironmentName="$ENV_NAME" \
+            VpcCidr="$VPC_CIDR" \
+            PublicSubnetACidr="$PUBLIC_SUBNET_A_CIDR" \
+            PublicSubnetBCidr="$PUBLIC_SUBNET_B_CIDR" \
+            PrivateSubnetACidr="$PRIVATE_SUBNET_A_CIDR" \
             PrivateSubnetBCidr="$PRIVATE_SUBNET_B_CIDR"
 
 artifacts:
