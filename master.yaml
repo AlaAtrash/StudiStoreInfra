@@ -6,6 +6,9 @@ Parameters:
     Type: String
     Default: dev
 
+  ArtifactBucket:
+    Type: String
+
   VpcCidr:
     Type: String
     Default: 10.0.0.0/16
@@ -45,7 +48,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: Network
     Properties:
-      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/security.yaml"
+      TemplateURL: "security.yaml"
       Parameters:
         EnvironmentName: !Ref EnvironmentName
         VpcId: !GetAtt Network.Outputs.VpcId

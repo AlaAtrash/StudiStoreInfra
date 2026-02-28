@@ -33,6 +33,7 @@ phases:
           --capabilities CAPABILITY_NAMED_IAM \
           --role-arn "$CFN_EXEC_ROLE_ARN" \
           --parameter-overrides \
+            ArtifactBucket="$ARTIFACT_BUCKET" \
             EnvironmentName="$ENV_NAME" \
             VpcCidr="$VPC_CIDR" \
             PublicSubnetACidr="$PUBLIC_SUBNET_A_CIDR" \
