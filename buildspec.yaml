@@ -4,15 +4,9 @@ phases:
   install:
     commands:
       - aws --version
-      - |
-        if [ -z "$ENV_FILE" ]; then
-          echo "ENV_FILE is required (for example: dev.env)"
-          exit 1
-        fi
-      - test -f "$ENV_FILE"
   build:
     commands:
-      - set -a; . "./$ENV_FILE"; set +a
+      - set -a; . "$ENV_FILE"; set +a
       - |
         aws cloudformation package \
           --region "$AWS_REGION" \
