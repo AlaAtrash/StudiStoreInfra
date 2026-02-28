@@ -6,22 +6,49 @@ Parameters:
     Type: String
     Default: dev
 
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnetACidr:
+    Type: String
+    Default: 10.0.0.0/24
+
+  PublicSubnetBCidr:
+    Type: String
+    Default: 10.0.1.0/24
+
+  PrivateSubnetACidr:
+    Type: String
+    Default: 10.0.10.0/24
+
+  PrivateSubnetBCidr:
+    Type: String
+    Default: 10.0.11.0/24
+
 Resources:
   Network:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: "network.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcCidr: !Ref VpcCidr
+        PublicSubnetACidr: !Ref PublicSubnetACidr
+        PublicSubnetBCidr: !Ref PublicSubnetBCidr
+        PrivateSubnetACidr: !Ref PrivateSubnetACidr
+        PrivateSubnetBCidr: !Ref PrivateSubnetBCidr
       
       
       
-  #Security:
-  #  Type: AWS::CloudFormation::Stack
-  #  DependsOn: Network
-  #  Properties:
-  #    TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/security.yaml"
-  #    Parameters:
-  #      EnvironmentName: !Ref EnvironmentName
-  #      VpcId: !GetAtt Network.Outputs.VpcId
+  Security:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Network
+    Properties:
+      TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/security.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcId: !GetAtt Network.Outputs.VpcId
 #
   #Rds:
   #  Type: AWS::CloudFormation::Stack

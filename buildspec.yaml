@@ -1,18 +1,15 @@
 version: 0.2
 
-env:
-  variables:
-    ENV_NAME: "dev"
-    AWS_REGION: "eu-west-3"
-    ARTIFACT_BUCKET: studiinfra-cfn-artifacts-bucket
-
-
 phases:
   install:
     commands:
       - aws --version
+      - ': "${ENV_FILE:?Set ENV_FILE to an env file path (for example: dev.env)}"'
+      - test -f "$ENV_FILE"
+      - echo "Loaded environment file: $ENV_FILE"
   build:
     commands:
+      - set -a; . "./$ENV_FILE"; set +a
       - aws cloudformation package
           --region "$AWS_REGION"
           --template-file master.yaml
@@ -26,9 +23,8 @@ phases:
         --stack-name "${ENV_NAME}-master" 
         --template-file master.packaged.yaml 
         --capabilities CAPABILITY_NAMED_IAM 
-        --parameter-overrides EnvironmentName="$ENV_NAME" 
-        --role-arn arn:aws:iam::142706263687:role/cfn-studistoreinfra-exec-role 
-        --parameter-overrides EnvironmentName="$ENV_NAME"
+        --role-arn "$CFN_EXEC_ROLE_ARN" 
+        --parameter-overrides EnvironmentName="$ENV_NAME" VpcCidr="$VPC_CIDR" PublicSubnetACidr="$PUBLIC_SUBNET_A_CIDR" PublicSubnetBCidr="$PUBLIC_SUBNET_B_CIDR" PrivateSubnetACidr="$PRIVATE_SUBNET_A_CIDR" PrivateSubnetBCidr="$PRIVATE_SUBNET_B_CIDR"
 
 artifacts:
   files:
