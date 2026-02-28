@@ -52,17 +52,17 @@ Resources:
       Parameters:
         EnvironmentName: !Ref EnvironmentName
         VpcId: !GetAtt Network.Outputs.VpcId
-#
-  #Rds:
-  #  Type: AWS::CloudFormation::Stack
-  #  DependsOn: Security
-  #  Properties:
-  #    TemplateURL: !Sub "https://${ArtifactBucket}.s3.${AWS::Region}.amazonaws.com/packaged/rds.yaml"
-  #    Parameters:
-  #      EnvironmentName: !Ref EnvironmentName
-  #      VpcId: !GetAtt Network.Outputs.VpcId
-  #      PrivateSubnetIds: !GetAtt Network.Outputs.PrivateSubnetIds
-  #      DbSecurityGroupId: !GetAtt Security.Outputs.RdsSecurityGroupId
+
+  Rds:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Security
+    Properties:
+      TemplateURL: "rds.yaml"
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcId: !GetAtt Network.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt Network.Outputs.PrivateSubnetIds
+        DbSecurityGroupId: !GetAtt Security.Outputs.RdsSecurityGroupId
 #
   #Ecs:
   #  Type: AWS::CloudFormation::Stack
