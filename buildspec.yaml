@@ -4,12 +4,19 @@ phases:
   install:
     commands:
       - aws --version
-      - ENV_FILE="${ENV_FILE:-dev.env}"
-      - test -f "$ENV_FILE"
-      - echo "Using env file: $ENV_FILE"
+      - |
+        if [ -z "$ENV_FILE" ]; then
+          ENV_FILE="dev.env"
+        fi
+        export ENV_FILE
+      - |
+        if [ ! -f "$ENV_FILE" ]; then
+          echo "Env file not found $ENV_FILE"
+          exit 1
+        fi
+      - echo "Using env file $ENV_FILE"
   build:
     commands:
-      - ENV_FILE="${ENV_FILE:-dev.env}"
       - set -a; . "./$ENV_FILE"; set +a
       - |
         aws cloudformation package \
