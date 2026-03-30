@@ -6,9 +6,6 @@ Parameters:
     Type: String
     Default: dev
 
-  ArtifactBucket:
-    Type: String
-
   VpcCidr:
     Type: String
     Default: 10.0.0.0/16
